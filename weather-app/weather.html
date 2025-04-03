@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather App</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="flex items-center justify-center min-h-screen bg-gray-100">
+    <div class="bg-white p-6 rounded-lg shadow-md w-full max-w-md text-center">
+        <h1 class="text-2xl font-semibold text-gray-800 mb-4">Weather App</h1>
+
+        <!-- Input & Button -->
+        <div class="flex gap-2 mb-4">
+            <input id="cityInput" type="text" placeholder="Enter city" class="flex-1 p-2 border rounded-md">
+            <button onclick="fetchWeather()" class="bg-blue-500 text-white px-4 py-2 rounded-md">Get Weather</button>
+        </div>
+
+        <!-- Weather Display -->
+        <div id="weatherDisplay" class="hidden">
+            <h2 class="text-lg font-semibold text-gray-700" id="location"></h2>
+            <p class="text-gray-500 text-sm" id="currentTime"></p>
+
+            <div class="mt-4 text-4xl font-bold" id="temperature"></div>
+            <p class="text-gray-500 text-sm" id="feelsLike"></p>
+
+            <!-- 7-Day Forecast -->
+            <div class="mt-6">
+                <h3 class="text-lg font-semibold text-gray-700 mb-2">Next 7 Days</h3>
+                <div id="forecast" class="grid grid-cols-2 gap-3 text-sm"></div>
+            </div>
+        </div>
+    </div>
+    <script src="weather.js"></script>
+</body>
+</html>
