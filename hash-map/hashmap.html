@@ -3,9 +3,110 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Hash Maps</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .input-section {
+            margin-bottom: 20px;
+        }
+        input {
+            margin-right: 10px;
+            padding: 5px;
+        }
+        button {
+            padding: 7px 15px;
+            cursor: pointer;
+        }
+        .output {
+            margin-top: 20px;
+        }
+        .hashmap {
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .bucket {
+            padding: 5px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            background-color: #f7f7f7;
+        }
+        #hashMapInfo {
+    margin: 20px;
+    font-family: Arial, sans-serif;
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+}
+
+#capacityValue, #entriesValue {
+    color: #007BFF;
+}
+
+#hashMapDisplay {
+    margin-top: 20px;
+    font-family: Arial, sans-serif;
+}
+
+.bucket {
+    background-color: #f7f7f7;
+    padding: 10px;
+    margin: 5px 0;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.bucket:nth-child(odd) {
+    background-color: #e1f5fe; /* Light blue for alternate buckets */
+}
+
+.bucket:nth-child(even) {
+    background-color: #e8f5e9; /* Light green for alternate buckets */
+}
+
+.bucket:hover {
+    background-color: #e0e0e0;
+    cursor: pointer;
+    transform: scale(1.02);
+    transition: 0.2s;
+}
+
+    </style>
 </head>
 <body>
+    <div class="container">
+        <h1>HashMap GUI</h1>
+
+        <div class="input-section">
+            <input type="text" id="keyInput" placeholder="Enter key" />
+            <input type="text" id="valueInput" placeholder="Enter value" />
+            <button onclick="addToHashMap()">Add to HashMap</button>
+        </div>
+
+        <button onclick="clearHashMap()">Clear HashMap</button>
+        <button onclick="resizeHashMap()">Resize HashMap</button>
+
+        <div class="output">
+            <h3>Current HashMap:</h3>
+            <div id="hashMapInfo">
+                <p>Capacity: <span id="capacityValue"></span></p>
+                <p>Number of Entries: <span id="entriesValue"></span></p>
+            </div>
+            <div id="hashMapDisplay"></div>
+            
+            <div id="hashMapDisplay" class="hashmap"></div>
+        </div>
+    </div>
+
+    
     <script src="hashmap.js"></script>
 </body>
 </html>

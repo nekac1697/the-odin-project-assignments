@@ -3,6 +3,267 @@
 //throw new Error("Trying to access index out of bounds");
 //}
 
+
+
+const test = new HashMap();
+test.set('apple', 'red')
+ test.set('banana', 'yellow')
+ test.set('carrot', 'orange')
+ test.set('dog', 'brown')
+ test.set('elephant', 'gray')
+ test.set('frog', 'green')
+ test.set('grape', 'purple')
+ test.set('hat', 'black')
+ test.set('ice cream', 'white')
+ test.set('jacket', 'blue')
+ test.set('kite', 'pink')
+ test.set('lion', 'golden')
+ updateDisplay()
+ 
+ function updateDisplay() {
+    const displayDiv = document.getElementById("hashMapDisplay");
+    const capacityDiv = document.getElementById("capacityValue");
+    const entriesDiv = document.getElementById("entriesValue");
+
+    displayDiv.innerHTML = '';  // Clear the current display
+
+    // Display Capacity and Number of Entries
+    capacityDiv.textContent = test.capacity;
+    entriesDiv.textContent = test.length();
+
+    // Iterate over each bucket in the hash map
+    for (let i = 0; i < test.buckets.length; i++) {
+        if (test.buckets[i] !== null) {
+            const bucketDiv = document.createElement('div');
+            bucketDiv.className = 'bucket';
+
+            // Check if the bucket has a linked list and traverse it
+            let current = test.buckets[i].head;
+            if (current) {
+                let bucketContents = `Bucket ${i}: `;
+                while (current !== null) {
+                    bucketContents += `${current.value.key}: ${current.value.value}, `;
+                    current = current.next;
+                }
+                bucketDiv.innerHTML = bucketContents.slice(0, -2); // Remove the last comma and space
+            }
+
+            displayDiv.appendChild(bucketDiv);
+        }
+    }
+}
+
+function addToHashMap() {
+    const key = document.getElementById('keyInput').value;
+    const value = document.getElementById('valueInput').value;
+
+    if (key && value) {
+        test.set(key, value);
+        updateDisplay();
+    }
+}
+
+function clearHashMap() {
+    test.clear();
+    updateDisplay();
+}
+
+
+
+ // imamo hashmap to je array ciji svaki element pravi linked list.
+    // pre nego sto ubacimo element u array, moramo da ga roknemo kroz hash fju - gde ce
+    //npr blue lion postati 776, i onda to podelimo sa module % od ukupne duzine array
+    // i dobijemo npr 776%16 = npr 8. znaci da ide na index 8
+    //ako je prazno unutra, postaje head, ako nije prazno postaje tail.
+function HashMap(loadFactor=0.75,capacity=16){
+    let buckets = new Array(capacity).fill(null)
+    
+    return{
+        buckets,
+        loadFactor,
+        capacity,
+        hash(key) {
+            let hashCode = 0;
+               
+            const primeNumber = 31;
+            for (let i = 0; i < key.length; i++) {
+              hashCode = primeNumber * hashCode + key.charCodeAt(i);
+            }
+         
+            return hashCode;
+          },
+        set(key,value){
+            let hashedValue = this.hash(key);
+            let index = hashedValue % this.capacity;
+
+            if(this.buckets[index]===null){
+                this.buckets[index] = new LinkedList();
+                this.buckets[index].prepend({
+                    key:key,
+                    value:value,  
+                })
+            }else{
+                let current = this.buckets[index].head;  
+
+                while(current !== null){
+                    if(current.value.key === key){
+                        current.value.value = value;
+                        return;
+                    }
+                    current = current.next;
+                }
+
+                this.buckets[index].prepend({ key, value });
+                console.log(
+                    'duzina: ' + this.length() + 
+                    'kapacitet: ' + this.capacity +
+                    'loadFactor: ' + this.loadFactor
+                )
+                if((this.length()/this.capacity)>this.loadFactor){
+                    console.log('resize called from set method')
+                    this.resize();
+                    return this.buckets;
+                }
+            }
+
+
+        },
+        get(key){
+            //get(key) takes one argument as a key and returns the value that is assigned to this key.
+            //  If a key is not found, return null.
+            let hashedValue = this.hash(key);
+            let index = hashedValue % this.capacity;
+
+            if(this.buckets[index]===null){
+                return null;
+            }else{
+                let current = this.buckets[index].head;
+                while(current!== null){
+                    if(current.value.key === key){
+                        return current.value.value;
+                    }
+                    current = current.next;
+                }
+                return null;  
+            }
+        },
+        has(key){
+            //has(key) takes a key as an argument and returns true or false 
+            // based on whether or not the key is in the hash map.
+
+            let hashedValue = this.hash(key);
+            let index = hashedValue % this.capacity;
+
+            if(this.buckets[index]===null){
+                return false;
+            }else{
+                let current = this.buckets[index].head;
+                while(current!== null){
+                    if(current.value.key === key){
+                        return true
+                    }
+                    current = current.next;
+                }
+                return false;
+            }
+        },
+        remove(key){
+            //remove(key) takes a key as an argument. If the given key is in the hash map,
+            //it should remove the entry with that key and return true. If the key isn’t in the hash map, it should return false.
+            let hashedValue = this.hash(key);
+            let index = hashedValue % this.capacity;
+
+            if(this.buckets[index]===null){
+                return false;
+            }else{
+                let current = this.buckets[index].head;
+                let i=0;
+                while(current!== null){
+                    if(current.value.key === key){
+                        this.buckets[index].removeAt(i)
+                        return true;
+                    }
+                    i++
+                    current = current.next;
+                }
+                return false;  
+            }
+        },
+        length(){
+           // length() returns the number of stored keys in the hash map.
+           let total = 0;
+           for(let bucket of this.buckets){
+            if(bucket !== null){
+                total+=bucket.size();
+            }
+            
+           }
+           return total;
+        },
+        clear() {
+            console.log('Before clear:', this.buckets);
+            this.buckets = new Array(capacity).fill(null);
+            console.log('After clear:', this.buckets);
+        },
+        keys(){
+            //keys() returns an array containing all the keys inside the hash map.
+            let keysArray = [];
+            for(let bucket of this.buckets){
+                if(bucket !== null){
+                    let current = bucket.head;
+                    while(current !== null){
+                        keysArray.push(current.value.key);
+                        current=current.next;
+                    }
+                }
+            }
+            return keysArray;
+        },
+        values(){
+            //values() returns an array containing all the values.
+            let valuesArray = [];
+            for(let bucket of this.buckets){
+                if(bucket !== null){
+                    let current = bucket.head;
+                    while(current !== null){
+                        valuesArray.push(current.value.value);
+                        current=current.next;
+                    }
+                }
+            }
+            return valuesArray;
+        },
+        entries(){
+            //entries() returns an array that contains each key, value pair.
+            //  Example: [[firstKey, firstValue], [secondKey, secondValue]]
+            let entriesArray = [];
+            for(let bucket of this.buckets){
+                if(bucket !== null){
+                    let current = bucket.head;
+                    while(current !== null){
+                        entriesArray.push(current.value);
+                        current=current.next;
+                    }
+                }
+            }
+            return entriesArray;
+        },
+        resize(){
+            console.log('resize called')
+            this.capacity = this.capacity*2;
+            let entries = this.entries();          
+            let newBuckets = new Array(this.capacity).fill(null);
+            this.buckets = newBuckets;
+            console.log(this.buckets);
+            
+            for (let i = 0; i < entries.length; i++) {
+                this.set(entries[i].key, entries[i].value)  
+            }
+            console.log(this.buckets);
+        }
+    }
+}
+
 function LinkedList(head=null){
 
     
@@ -219,213 +480,5 @@ function Node(value=null,next=null){
     return {
         value,
         next
-    }
-}
-
-const test = new HashMap();
-test.set('apple', 'red')
- test.set('banana', 'yellow')
- test.set('carrot', 'orange')
- test.set('dog', 'brown')
- test.set('elephant', 'gray')
- test.set('frog', 'green')
- test.set('grape', 'purple')
- test.set('hat', 'black')
- test.set('ice cream', 'white')
- test.set('jacket', 'blue')
- test.set('kite', 'pink')
- test.set('lion', 'golden')
-
- // imamo hashmap to je array ciji svaki element pravi linked list.
-    // pre nego sto ubacimo element u array, moramo da ga roknemo kroz hash fju - gde ce
-    //npr blue lion postati 776, i onda to podelimo sa module % od ukupne duzine array
-    // i dobijemo npr 776%16 = npr 8. znaci da ide na index 8
-    //ako je prazno unutra, postaje head, ako nije prazno postaje tail.
-function HashMap(loadFactor=0.75,capacity=16){
-    let buckets = new Array(capacity).fill(null)
-    
-    return{
-        buckets,
-        loadFactor,
-        capacity,
-        hash(key) {
-            let hashCode = 0;
-               
-            const primeNumber = 31;
-            for (let i = 0; i < key.length; i++) {
-              hashCode = primeNumber * hashCode + key.charCodeAt(i);
-            }
-         
-            return hashCode;
-          },
-        set(key,value){
-            let hashedValue = this.hash(key);
-            let index = hashedValue % this.capacity;
-
-            if(this.buckets[index]===null){
-                this.buckets[index] = new LinkedList();
-                this.buckets[index].prepend({
-                    key:key,
-                    value:value,  
-                })
-            }else{
-                let current = this.buckets[index].head;  
-
-                while(current !== null){
-                    if(current.value.key === key){
-                        current.value.value = value;
-                        return;
-                    }
-                    current = current.next;
-                }
-
-                this.buckets[index].prepend({ key, value });
-                console.log(
-                    'duzina: ' + this.length() + 
-                    'kapacitet: ' + this.capacity +
-                    'loadFactor: ' + this.loadFactor
-                )
-                if((this.length()/this.capacity)>this.loadFactor){
-                    console.log('resize called from set method')
-                    this.resize();
-                    return this.buckets;
-                }
-            }
-
-
-        },
-        get(key){
-            //get(key) takes one argument as a key and returns the value that is assigned to this key.
-            //  If a key is not found, return null.
-            let hashedValue = this.hash(key);
-            let index = hashedValue % this.capacity;
-
-            if(this.buckets[index]===null){
-                return null;
-            }else{
-                let current = this.buckets[index].head;
-                while(current!== null){
-                    if(current.value.key === key){
-                        return current.value.value;
-                    }
-                    current = current.next;
-                }
-                return null;  
-            }
-        },
-        has(key){
-            //has(key) takes a key as an argument and returns true or false 
-            // based on whether or not the key is in the hash map.
-
-            let hashedValue = this.hash(key);
-            let index = hashedValue % this.capacity;
-
-            if(this.buckets[index]===null){
-                return false;
-            }else{
-                let current = this.buckets[index].head;
-                while(current!== null){
-                    if(current.value.key === key){
-                        return true
-                    }
-                    current = current.next;
-                }
-                return false;
-            }
-        },
-        remove(key){
-            //remove(key) takes a key as an argument. If the given key is in the hash map,
-            //it should remove the entry with that key and return true. If the key isn’t in the hash map, it should return false.
-            let hashedValue = this.hash(key);
-            let index = hashedValue % this.capacity;
-
-            if(this.buckets[index]===null){
-                return false;
-            }else{
-                let current = this.buckets[index].head;
-                let i=0;
-                while(current!== null){
-                    if(current.value.key === key){
-                        this.buckets[index].removeAt(i)
-                        return true;
-                    }
-                    i++
-                    current = current.next;
-                }
-                return false;  
-            }
-        },
-        length(){
-           // length() returns the number of stored keys in the hash map.
-           let total = 0;
-           for(let bucket of this.buckets){
-            if(bucket !== null){
-                total+=bucket.size();
-            }
-            
-           }
-           return total;
-        },
-        clear() {
-            console.log('Before clear:', this.buckets);
-            this.buckets = new Array(capacity).fill(null);
-            console.log('After clear:', this.buckets);
-        },
-        keys(){
-            //keys() returns an array containing all the keys inside the hash map.
-            let keysArray = [];
-            for(let bucket of this.buckets){
-                if(bucket !== null){
-                    let current = bucket.head;
-                    while(current !== null){
-                        keysArray.push(current.value.key);
-                        current=current.next;
-                    }
-                }
-            }
-            return keysArray;
-        },
-        values(){
-            //values() returns an array containing all the values.
-            let valuesArray = [];
-            for(let bucket of this.buckets){
-                if(bucket !== null){
-                    let current = bucket.head;
-                    while(current !== null){
-                        valuesArray.push(current.value.value);
-                        current=current.next;
-                    }
-                }
-            }
-            return valuesArray;
-        },
-        entries(){
-            //entries() returns an array that contains each key, value pair.
-            //  Example: [[firstKey, firstValue], [secondKey, secondValue]]
-            let entriesArray = [];
-            for(let bucket of this.buckets){
-                if(bucket !== null){
-                    let current = bucket.head;
-                    while(current !== null){
-                        entriesArray.push(current.value);
-                        current=current.next;
-                    }
-                }
-            }
-            return entriesArray;
-        },
-        resize(){
-            console.log('resize called')
-            this.capacity = this.capacity*2;
-            let entries = this.entries();          
-            let newBuckets = new Array(this.capacity).fill(null);
-            this.buckets = newBuckets;
-            console.log(this.buckets);
-            
-            for (let i = 0; i < entries.length; i++) {
-                this.set(entries[i].key, entries[i].value)  
-            }
-            console.log(this.buckets);
-        }
     }
 }
