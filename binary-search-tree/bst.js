@@ -14,7 +14,83 @@ function Node(value=null,left=null,right=null){
 //The Tree class should have a root attribute, which uses the return value of buildTree which you’ll write next.
 
 function Tree(arr){
-    let root = buildTree(arr)
+    let root = buildTree(arr);
+    return{
+        root,
+        prettyPrint(node=this.root, prefix = "", isLeft = true){
+            if (node === null) {
+              return;
+            }
+            if (node.right !== null) {
+              this.prettyPrint(node.right, `${prefix}${isLeft ? "│   " : "    "}`, false);
+            }
+            console.log(`${prefix}${isLeft ? "└── " : "┌── "}${node.value}`);
+            if (node.left !== null) {
+              this.prettyPrint(node.left, `${prefix}${isLeft ? "    " : "│   "}`, true);
+            }
+          },
+        
+        insert(value){
+            let current = this.root;
+            let parent;
+            let i = 0;
+            while(current !== null){
+                if(value === current.value){
+                    console.log('duplicate value')
+                    return;
+                }
+                else if(value < current.value){
+                    parent = current;
+                    current = current.left;
+                    console.log('Manje' + i)
+                    i++
+                }
+                else{
+                    parent = current;
+                    current = current.right;
+                    console.log('vece' + i)
+                    i++
+                }
+            }
+            
+            console.log('current' + current)
+            current = new Node(value);
+            if(parent.value > current.value){
+                parent.left = current
+            }else{
+                parent.right = current
+            }
+            console.log('current' + current.value)
+          
+        },
+        deleteItem(value){
+            let current = this.root;
+            let parent;
+            while(current !== null){
+                if(value === current.value){
+                   
+                    current = null;
+                    return;
+                }
+                else if(value < current.value){
+                    parent = current;
+                    current = current.left;
+                    console.log('Manje')
+                    
+                }
+                else{
+                    parent = current;
+                    current = current.right;
+                    console.log('vece')
+                    
+                }
+            }
+            console.log('no such value')
+            return;
+        }
+    }
+    
+
 }
 
 //Write a buildTree(array) function that takes an array of data (e.g., [1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324])
@@ -95,3 +171,6 @@ const prettyPrint = (node, prefix = "", isLeft = true) => {
 let arr = [1,8,2,14,5,67,34,22,21,64,12,15]
 let tree = buildTree(arr)
 prettyPrint(tree);
+
+
+let myTree = Tree([1, 8, 2, 14, 5, 67, 34, 22, 21, 64, 12, 15]);
